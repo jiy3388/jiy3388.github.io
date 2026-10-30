@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>체육 수업 관리 포털</title>
+    <title>정일용 선생님의 수업 도구 포털</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
         .header { text-align: center; padding: 20px; background-color: #2c3e50; color: white; border-radius: 10px; margin-bottom: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
         .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
         .card h2 { color: #2980b9; margin-top: 0; }
-        .btn { display: inline-block; padding: 10px 20px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px; }
+        .btn { display: inline-block; padding: 10px 20px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px; font-weight: bold; }
         .btn:hover { background-color: #2ecc71; }
+        
+        /* 비활성화(개발 중) 버튼 스타일 */
+        .btn-disabled { background-color: #95a5a6; color: white; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -22,20 +25,32 @@
     </div>
 
     <div class="grid">
+        <!-- 1. 야구전용 전광판 -->
         <div class="card">
-            <h2>체육관 전광판</h2>
-            <p>실시간 점수 및 세트 스코어 관리</p>
-            <a href="#" class="btn">실행하기</a>
+            <h2>야구전용 전광판</h2>
+            <p>이닝, 볼카운트 및 실시간 점수 관리</p>
+            <a href="baseball.html" class="btn">실행하기</a>
         </div>
+
+        <!-- 2. 청팀백팀 전광판 -->
         <div class="card">
-            <h2>수업 타이머</h2>
-            <p>인터벌 트레이닝 및 경기 시간 측정</p>
-            <a href="#" class="btn">실행하기</a>
+            <h2>청팀백팀 전광판</h2>
+            <p>체육대회 및 운동회 양팀 점수판</p>
+            <a href="blue_white.html" class="btn">실행하기</a>
         </div>
+
+        <!-- 3. 스마트체육수업관리 -->
         <div class="card">
-            <h2>걷기 리더보드</h2>
-            <p>교내 걷기 챌린지 실시간 순위표</p>
-            <a href="#" class="btn">실행하기</a>
+            <h2>스마트체육수업관리</h2>
+            <p>수업 기록, 출석 및 학생 평가 관리 시스템</p>
+            <span class="btn btn-disabled">현재 개발 중입니다</span>
+        </div>
+
+        <!-- 4. 교내 만보기 앱 (개발 중) -->
+        <div class="card">
+            <h2>교내 만보기 앱</h2>
+            <p>학생 건강 증진을 위한 안드로이드 걷기 챌린지 앱</p>
+            <span class="btn btn-disabled">현재 개발 중입니다</span>
         </div>
     </div>
 
