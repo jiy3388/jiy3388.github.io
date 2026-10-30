@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Day Play Go 체육한마당</title>
+    <style>
+        /* 기본 리셋 및 폰트 설정 */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            font-family: 'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background-color: #1e293b;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        /* 상단 헤더 (대회명 다채로운 색상 적용) */
+        .header {
+            width: 100%;
+            height: 12vh; /* 높이 약간 확대 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #1e293b;
+            color: #ffffff;
+            font-size: 7.5vh; /* 4.5vh에서 7.5vh로 대폭 확대 */
+            font-weight: 900;
+            letter-spacing: 3px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        /* YDPG 컬러 스팬 */
+        .color-y { color: #FF6B6B; }
+        .color-d { color: #FFD93D; }
+        .color-p { color: #6BCB77; }
+        .color-g { color: #4D96FF; }
+
+        /* 점수판 메인 영역 */
+        .board {
+            display: flex;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* 각 팀 영역 공통 스타일 */
+        .team {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+        }
+
+        /* 백팀 전용 스타일 (이제 왼쪽으로 옴) */
+        .white-team {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .white-team .btn-plus { background-color: #e2e8f0; color: #0f172a; }
+        .white-team .btn-minus { background-color: #f1f5f9; color: #64748b; }
+
+        /* 청팀 전용 스타일 (이제 오른쪽으로 옴) */
+        .blue-team {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+        .blue-team .btn-plus { background-color: #1d4ed8; color: #ffffff; }
+        .blue-team .btn-minus { background-color: rgba(255, 255, 255, 0.15); color: #ffffff; }
+
+        /* 팀 이름 (크기 대폭 확대) */
+        .team-name {
+            font-size: 10vh; /* 6vh에서 10vh로 확대 */
+            font-weight: 900;
+            margin-top: 4vh;
+            margin-bottom: 1vh;
+        }
+
+        /* 소속 학급 태그 스타일 */
+        .class-list {
+            display: flex;
+            gap: 0.8vw;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2vh;
+        }
+
+        .class-tag {
+            font-size: 2.2vh;
+            font-weight: 700;
+            padding: 0.6vh 1.2vw;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 팀별 학급 태그 색상 */
+        .white-team .class-tag {
+            background-color: #ffffff;
+            color: #475569;
+            border: 2px solid #cbd5e1;
+        }
+        .blue-team .class-tag {
+            background-color: #3b82f6;
+            color: #ffffff;
+            border: 2px solid #60a5fa;
+        }
+
+        /* 점수 숫자 */
+        .score {
+            font-size: 40vh;
+            font-weight: 900;
+            line-height: 1;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* 버튼 그룹 컨테이너 */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5vh;
+            margin-bottom: 12vh;
+        }
+        .btn-row {
+            display: flex;
+            gap: 1.5vw;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 공통 버튼 스타일 */
+        button {
+            border: none;
+            border-radius: 12px;
+            font-size: 2.2vh;
+            font-weight: 800;
+            width: 8vw;
+            height: 6vh;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            touch-action: manipulation;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* 점수 조작 버튼 크기 개별 설정 */
+        .btn-plus {
+            width: 6.5vw;
+            height: 5vh;
+            font-size: 1.8vh;
+        }
+        .btn-minus {
+            width: 4.5vw;
+            height: 3.5vh;
+            font-size: 1.3vh;
+            border-radius: 8px;
+        }
+
+        /* 하단 컨트롤 영역 (리셋 및 타이머 아이콘) */
+        .bottom-controls {
+            position: absolute;
+            bottom: 3vh;
+            right: 3vw;
+            display: flex;
+            gap: 1.5vw; /* 두 버튼 사이 간격 */
+            z-index: 20;
+        }
+
+        /* 하단 우측 원형 액션 버튼 공통 */
+        .action-btn {
+            width: 7.5vh;
+            height: 7.5vh;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            cursor: pointer;
+            border: none;
+            pointer-events: auto;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+        .action-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* 리셋 버튼 */
+        .reset-btn {
+            background-color: #ef4444;
+            color: white;
+            font-size: 1.6vh;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .reset-btn:hover { background-color: #dc2626; }
+
+        /* 타이머 아이콘 버튼 */
+        .timer-icon-btn {
+            background-color: #334155;
+            color: white;
+            font-size: 3.5vh;
+        }
+        .timer-icon-btn:hover { background-color: #475569; }
+
+        /* 모달 (팝업) 공통 스타일 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 4vh 4vw;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            min-width: 300px;
+        }
+
+        /* 타이머 팝업 내 스타일 */
+        .timer-display {
+            font-size: 12vh;
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+            margin: 2vh 0;
+            color: #FFD93D;
+            letter-spacing: 2px;
+        }
+        
+        .timer-add-row {
+            display: flex;
+            justify-content: center;
+            gap: 1vw;
+            margin-bottom: 3vh;
+        }
+        
+        .timer-add-row button {
+            background-color: #334155;
+            color: white;
+            width: auto;
+            padding: 0 2vw;
+        }
+        .timer-add-row button:active { background-color: #475569; }
+
+        .timer-ctrl-row {
+            display: flex;
+            justify-content: center;
+            gap: 1vw;
+            margin-bottom: 3vh;
+        }
+        
+        .timer-ctrl-row button { width: auto; padding: 0 2vw; }
+        .btn-start { background-color: #6BCB77; color: #1e293b; }
+        .btn-pause { background-color: #FFD93D; color: #1e293b; }
+        .btn-reset { background-color: #ef4444; color: white; }
+        
+        .btn-close {
+            background-color: transparent;
+            border: 2px solid #64748b;
+            color: #94a3b8;
+            width: 100%;
+            height: 5vh;
+        }
+
+        /* 커스텀 경고창 (초기화용) */
+        .confirm-title {
+            font-size: 3vh;
+            font-weight: 700;
+            margin-bottom: 4vh;
+        }
+        .confirm-btn-row {
+            display: flex;
+            justify-content: center;
+            gap: 2vw;
+        }
+        .btn-confirm-yes { background-color: #ef4444; color: white; width: auto; padding: 0 3vw;}
+        .btn-confirm-no { background-color: #64748b; color: white; width: auto; padding: 0 3vw;}
+
+    </style>
+</head>
+<body>
+
+    <!-- 대회명 -->
+    <div class="header">
+        <span class="color-y">Your</span>&nbsp;
+        <span class="color-d">Day</span>&nbsp;
+        <span class="color-p">Play</span>&nbsp;
+        <span class="color-g">Go</span>&nbsp;
+        <span>체육한마당</span>
+    </div>
+
+    <!-- 점수판 영역 -->
+    <div class="board">
+        
+        <!-- 백팀 (왼쪽으로 이동) -->
+        <div class="team white-team">
+            <div class="team-name">백 팀</div>
+            <div class="class-list">
+                <span class="class-tag">1-2</span>
+                <span class="class-tag">1-4</span>
+                <span class="class-tag">1-5</span>
+                <span class="class-tag">2-2</span>
+                <span class="class-tag">2-4</span>
+            </div>
+            <div class="score" id="score-white">0</div>
+            
+            <div class="controls">
+                <div class="btn-row">
+                    <button class="btn-plus" onclick="updateScore('white', 100)">+100</button>
+                    <button class="btn-plus" onclick="updateScore('white', 50)">+50</button>
+                    <button class="btn-plus" onclick="updateScore('white', 10)">+10</button>
+                </div>
+                <div class="btn-row">
+                    <button class="btn-minus" onclick="updateScore('white', -100)">-100</button>
+                    <button class="btn-minus" onclick="updateScore('white', -50)">-50</button>
+                    <button class="btn-minus" onclick="updateScore('white', -10)">-10</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 청팀 (오른쪽으로 이동) -->
+        <div class="team blue-team">
+            <div class="team-name">청 팀</div>
+            <div class="class-list">
+                <span class="class-tag">1-1</span>
+                <span class="class-tag">1-3</span>
+                <span class="class-tag">2-1</span>
+                <span class="class-tag">2-3</span>
+                <span class="class-tag">2-5</span>
+            </div>
+            <div class="score" id="score-blue">0</div>
+            
+            <div class="controls">
+                <div class="btn-row">
+                    <button class="btn-plus" onclick="updateScore('blue', 100)">+100</button>
+                    <button class="btn-plus" onclick="updateScore('blue', 50)">+50</button>
+                    <button class="btn-plus" onclick="updateScore('blue', 10)">+10</button>
+                </div>
+                <div class="btn-row">
+                    <button class="btn-minus" onclick="updateScore('blue', -100)">-100</button>
+                    <button class="btn-minus" onclick="updateScore('blue', -50)">-50</button>
+                    <button class="btn-minus" onclick="updateScore('blue', -10)">-10</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 하단 컨트롤 영역 (점수 초기화 & 타이머 버튼) -->
+    <div class="bottom-controls">
+        <button class="action-btn reset-btn" onclick="openConfirmModal()">점수<br>리셋</button>
+        <button class="action-btn timer-icon-btn" onclick="openTimerModal()">⏱️</button>
+    </div>
+
+    <!-- 타이머 팝업 모달 -->
+    <div id="timer-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="timer-display" id="timer-display">00:00</div>
+            
+            <div class="timer-add-row">
+                <button onclick="addTime(10)">+ 10초</button>
+                <button onclick="addTime(30)">+ 30초</button>
+            </div>
+            
+            <div class="timer-ctrl-row">
+                <button class="btn-start" onclick="startTimer()">시작</button>
+                <button class="btn-pause" onclick="pauseTimer()">일시중지</button>
+                <button class="btn-reset" onclick="resetTimer()">리셋</button>
+            </div>
+            
+            <button class="btn-close" onclick="closeTimerModal()">닫기</button>
+        </div>
+    </div>
+
+    <!-- 점수 초기화 확인 커스텀 모달 (alert/confirm 대체) -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="confirm-title">정말로 모든 점수를<br>0점으로 초기화하시겠습니까?</div>
+            <div class="confirm-btn-row">
+                <button class="btn-confirm-yes" onclick="executeReset()">예</button>
+                <button class="btn-confirm-no" onclick="closeConfirmModal()">아니오</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- 점수판 관련 로직 --- */
+        var scores = {
+            blue: 0,
+            white: 0
+        };
+
+        function updateScore(team, points) {
+            scores[team] = scores[team] + points;
+            if (scores[team] < 0) {
+                scores[team] = 0;
+            }
+            document.getElementById('score-' + team).innerText = scores[team];
+        }
+
+        // 초기화 커스텀 모달 제어
+        function openConfirmModal() {
+            document.getElementById('confirm-modal').style.display = 'flex';
+        }
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').style.display = 'none';
+        }
+        function executeReset() {
+            scores.blue = 0;
+            scores.white = 0;
+            document.getElementById('score-blue').innerText = '0';
+            document.getElementById('score-white').innerText = '0';
+            closeConfirmModal();
+        }
+
+        /* --- 타이머 관련 로직 --- */
+        var timeInSeconds = 0;
+        var timerInterval = null;
+        var isRunning = false;
+
+        function openTimerModal() {
+            document.getElementById('timer-modal').style.display = 'flex';
+            updateTimerDisplay();
+        }
+
+        function closeTimerModal() {
+            document.getElementById('timer-modal').style.display = 'none';
+        }
+
+        function addTime(seconds) {
+            timeInSeconds += seconds;
+            updateTimerDisplay();
+        }
+
+        function startTimer() {
+            if (isRunning || timeInSeconds <= 0) return;
+            isRunning = true;
+            timerInterval = setInterval(function() {
+                if (timeInSeconds > 0) {
+                    timeInSeconds--;
+                    updateTimerDisplay();
+                } else {
+                    // 타이머 종료 시
+                    pauseTimer();
+                    // 필요한 경우 여기에 종료 알림음 재생 코드 추가 가능
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            isRunning = false;
+            clearInterval(timerInterval);
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timeInSeconds = 0;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            var m = Math.floor(timeInSeconds / 60);
+            var s = timeInSeconds % 60;
+            
+            // 두 자리 숫자로 맞추기
+            var minStr = m < 10 ? '0' + m : m;
+            var secStr = s < 10 ? '0' + s : s;
+            
+            document.getElementById('timer-display').innerText = minStr + ':' + secStr;
+        }
+    </script>
+</body>
+</html>
